@@ -1,0 +1,29 @@
+PODS:
+  - beacons (0.0.1):
+    - Flutter
+    - streams_channel
+  - Flutter (1.0.0)
+  - streams_channel (0.2.1):
+    - Flutter
+
+DEPENDENCIES:
+  - beacons (from `.symlinks/plugins/beacons/ios`)
+  - Flutter (from `.symlinks/flutter/ios`)
+  - streams_channel (from `.symlinks/plugins/streams_channel/ios`)
+
+EXTERNAL SOURCES:
+  beacons:
+    :path: ".symlinks/plugins/beacons/ios"
+  Flutter:
+    :path: ".symlinks/flutter/ios"
+  streams_channel:
+    :path: ".symlinks/plugins/streams_channel/ios"
+
+SPEC CHECKSUMS:
+  beacons: 7607278ada4cb9f4801510a1cb730bada3053027
+  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
+  streams_channel: 7e83cef39495e5007e3586e58b6ecb703c7c1fea
+
+PODFILE CHECKSUM: 7765ea4305eaab0b3dfd384c7de11902aa3195fd
+
+COCOAPODS: 1.5.3

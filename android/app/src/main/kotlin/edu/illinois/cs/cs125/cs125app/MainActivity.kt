@@ -16,14 +16,17 @@ class MainActivity : FlutterActivity() {
 
   override fun onResume() {
     super.onResume()
-    if (BuildConfig.DEBUG) { // don't even consider it otherwise
-      if (Debug.isDebuggerConnected()) {
-        Log.d("SCREEN", "Keeping screen on for debugging, detach debugger and force an onResume to turn it off.")
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-      } else {
-        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        Log.d("SCREEN", "Keeping screen on for debugging is now deactivated.")
-      }
+    if (BuildConfig.DEBUG) {
+      Log.d("CS125", "Enabling screen on");
+      window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    if (BuildConfig.DEBUG) {
+      Log.d("CS125", "Disabling screen on");
+      window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
   }
 }

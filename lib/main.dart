@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:beacons/beacons.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:logging/logging.dart';
 
-void main() => runApp(new MyApp());
+Logger _log;
+FlutterBlue _flutterBlue;
+
+void main() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((LogRecord rec) {
+    print('${rec.level.name}: ${rec.time}: ${rec.message}');
+  });
+  _log = new Logger('CS125');
+
+  _flutterBlue = FlutterBlue.instance;
+
+  runApp(new MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -32,21 +46,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<String> _messages;
-  FlutterBlue _flutterBlue;
+  var _isMonitoring = false;
+  List<String> _messages = [];
 
   @override
   void initState() {
-    _flutterBlue = FlutterBlue.instance;
-    _messages = [];
-    
+    _log.fine("initState");
+
     _startMonitoring();
     _flutterBlue.onStateChanged().listen((state) {
       if (state == BluetoothState.on) {
-        print("Bluetooth turned on");
+        _log.fine("Bluetooth turned on");
         _startMonitoring();
       } else if (state == BluetoothState.off) {
-        print("Bluetooth turned off");
+        _log.fine("Bluetooth turned off");
         _stopMonitoring();
       }
     });
@@ -55,35 +68,54 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() async {
-    _stopMonitoring();
+    await _stopMonitoring();
     super.dispose();
   }
 
   void _startMonitoring() async {
-    var bluetoothState = await _flutterBlue.state;
-    if (bluetoothState != BluetoothState.on) {
-      print("not starting monitoring: Bluetooth disabled");
+    if (_isMonitoring) {
+      _log.fine("alreading monitoring so not stopping");
       return;
     }
+    var bluetoothState = await _flutterBlue.state;
+    if (bluetoothState != BluetoothState.on) {
+      _log.fine("not starting monitoring: Bluetooth disabled");
+      return;
+    }
+
+    Beacons.backgroundMonitoringEvents().listen((event) {
+      _log.fine("heard background beacon $event");
+      setState(() {
+        _messages.insert(0, event.toString());
+      });
+    });
 
     for (final region in widget.regions) {
       Beacons
           .monitoring(region: region, inBackground: true)
           .listen((beaconResult) {
         setState(() {
-          print("heard beacon: " + beaconResult.toString());
+          _log.fine("heard beacon $beaconResult");
           _messages.insert(0, beaconResult.toString());
         });
       });
     }
-    print("started monitoring");
+
+    _log.fine("started monitoring");
+    _isMonitoring = true;
   }
 
   void _stopMonitoring() async {
+    if (!_isMonitoring) {
+      _log.fine("not monitoring so not stopping");
+      return;
+    }
     for (final region in widget.regions) {
       await Beacons.stopMonitoring(region);
     }
-    print("stopped monitoring");
+
+    _log.fine("stopped monitoring");
+    _isMonitoring = false;
   }
 
   @override

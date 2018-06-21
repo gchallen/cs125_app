@@ -57,9 +57,15 @@ class _MyHomePageState extends State<MyHomePage> {
     _flutterBlue.onStateChanged().listen((state) {
       if (state == BluetoothState.on) {
         _log.fine("Bluetooth turned on");
+        setState(() {
+          _messages.insert(0, "Bluetooth turned on");
+        });
         _startMonitoring();
       } else if (state == BluetoothState.off) {
         _log.fine("Bluetooth turned off");
+        setState(() {
+          _messages.insert(0, "Bluetooth turned off");
+        });
         _stopMonitoring();
       }
     });
